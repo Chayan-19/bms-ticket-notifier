@@ -3,19 +3,24 @@ name: BMS Ticket Checker
 on:
   schedule:
     # Every 30 minutes
-    - cron: '*/30 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:  # Manual trigger button
 
 jobs:
   check-tickets:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Download previous state
+        uses: actions/download-artifact@v4
+        with:
+          name: bms-state
+          path: .
+        continue-on-error: true  # First run won't have artifact
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -36,10 +41,9 @@ jobs:
           BMS_TIME: ${{ vars.BMS_TIME }}
         run: uv run main.py
 
-      - name: Commit updated state
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull origin main --rebase
-          git add bms_state.json
-          git diff --cached --quiet || (git commit -m "chore: update bms_state.json [skip ci]" && git push origin main)
+      - name: Upload state artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bms-state
+          path: bms_state.json
+          retention-days: 30

@@ -22,7 +22,7 @@ Go to **Settings → Secrets and variables → Actions** and add:
 |--------|-------------|
 | `RESEND_API_KEY` | API key from [resend.com](https://resend.com) |
 | `RESEND_FROM_EMAIL` | Email address to send notifications (use your own domain email or anything@resend.dev) |
-| `RESEND_TO_EMAIL` | Email address to receive notifications |
+| `RESEND_TO_EMAIL` | Email address(es) to receive notifications, comma-separated |
 
 ### 3. Set GitHub Variables
 
@@ -53,8 +53,8 @@ export BMS_DATES="20260318,20260319"
 export BMS_THEATRE="PVR"
 export BMS_TIME="evening,night"
 export RESEND_API_KEY="re_..."
-export RESEND_TO_EMAIL="you@example.com"
-export RESEND_TO_EMAIL="python@resend.dev"
+export RESEND_TO_EMAIL="you@example.com,friend@example.com"
+export RESEND_FROM_EMAIL="python@resend.dev"
 
 uv run main.py
 ```

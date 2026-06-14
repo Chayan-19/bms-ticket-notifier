@@ -389,12 +389,16 @@ def _cat_status_label(status):
     return AVAIL_STATUS_MAP.get(status, ("UNKNOWN", ""))[0]
 
 
+def _parse_email_list(value):
+    return [email.strip() for email in value.split(",") if email.strip()]
+
+
 def send_email(subject, changes, shows, movie_info):
     api_key = RESEND_API_KEY.strip()
-    to = RESEND_TO_EMAIL.strip()
+    to_emails = _parse_email_list(RESEND_TO_EMAIL)
     frm = RESEND_FROM_EMAIL.strip() or "onboarding@resend.dev"
 
-    if not api_key or not to:
+    if not api_key or not to_emails:
         print("  ⚠️  Skipping email — RESEND_API_KEY or RESEND_TO_EMAIL not set.")
         return
 
@@ -505,14 +509,14 @@ def send_email(subject, changes, shows, movie_info):
                 "Content-Type": "application/json",
             },
             json={
-                "from": frm, "to": [to],
+                "from": frm, "to": to_emails,
                 "subject": subject,
                 "text": plain, "html": html,
             },
             timeout=15,
         )
         if resp.status_code in (200, 201):
-            print(f"  ✅ Email sent to {to}")
+            print(f"  ✅ Email sent to {', '.join(to_emails)}")
         else:
             print(f"  ❌ Resend {resp.status_code}: {resp.text}")
             sys.exit(1)
